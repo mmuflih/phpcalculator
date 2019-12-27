@@ -22,6 +22,10 @@ try {
         $container->make($provider)->register($container);
     }
 
+    foreach ($providers as $provider) {
+        $container->make($provider)->register($container);
+    }
+
     $commands = require_once __DIR__ . '/commands.php';
     $commands = collect($commands)
         ->map(
