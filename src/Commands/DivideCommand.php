@@ -11,7 +11,7 @@ namespace Jakmall\Recruitment\Calculator\Commands;
 
 use Illuminate\Console\Command;
 use Jakmall\Recruitment\Calculator\Drivers\HistoryDriverInterface;
-use Jakmall\Recruitment\Calculator\Models\CalculatorData;
+use Jakmall\Recruitment\Calculator\Handler\DivideHandler;
 
 class DivideCommand extends Command
 {
@@ -31,18 +31,8 @@ class DivideCommand extends Command
 	public function handle()
 	{
 		$args = $this->arguments();
-		$results = 0;
-		foreach ($args['numbers'] as $arg) {
-			if ($results == 0) {
-				$results = (int)$arg;
-				continue;
-			}
-			$results /= (int)$arg;
-		}
-
-		$operation = implode(" / ", $args['numbers']);
-		$data = CalculatorData::createNew("divide", $operation, $results);
+		$handler = new DivideHandler($args['numbers'], $this->driver);
+		$data = $handler->handle();
 		$data->print();
-		$this->driver->make(null)->log($data->toCsv());
 	}
 }
