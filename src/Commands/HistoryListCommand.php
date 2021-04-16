@@ -11,6 +11,7 @@ namespace Jakmall\Recruitment\Calculator\Commands;
 
 use Illuminate\Console\Command;
 use Jakmall\Recruitment\Calculator\Drivers\HistoryDriverInterface;
+use Jakmall\Recruitment\Calculator\Handler\HistoryHandler;
 use Jakmall\Recruitment\Calculator\Models\CalculatorData;
 
 class HistoryListCommand extends Command
@@ -33,6 +34,7 @@ class HistoryListCommand extends Command
 		$opt = $this->options();
 
 		$repo = $this->driver->make($opt['driver']);
+		$handler = new HistoryHandler($repo);
 		if (isset($args['id']) && (int)$args['id'] > 0) {
 			$item = $repo->find($args['id']);
 			$rows = $this->createRow($item);
@@ -40,18 +42,14 @@ class HistoryListCommand extends Command
 			return;
 		}
 
-		$items = $repo->findAll();
+		$items = $handler->handle();
 		$this->writeData($items);
 	}
 
 	public function writeData($items)
 	{
 		$rows = "";
-		for ($i = 0; $i < count($items); $i++) {
-			$data = CalculatorData::fromCsv($items[$i]);
-			if (is_null($data)) {
-				continue;
-			}
+		foreach ($items as $data) {
 			$rows .= $this->createRow($data);
 		}
 		$this->createTable($rows);

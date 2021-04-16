@@ -3,13 +3,28 @@
 namespace Jakmall\Recruitment\Calculator\Http\Controller;
 
 use Illuminate\Http\Request;
+use Jakmall\Recruitment\Calculator\Drivers\HistoryDriverInterface;
+use Jakmall\Recruitment\Calculator\Handler\HistoryHandler;
 
-class HistoryController
+class HistoryController extends ApiController
 {
-    public function index()
+    private $driver;
+
+    public function __construct(HistoryDriverInterface $driver)
     {
-        // todo: modify codes to get history
-        dd('create history logic here');
+        $this->driver = $driver;
+    }
+
+    public function index(Request $request)
+    {
+        try {
+            $repo = $this->driver->make($request->get('driver'));
+            $handler = new HistoryHandler($repo);
+            $data = $handler->handle();
+            return $this->responseData($data);
+        } catch (\Exception $e) {
+            return $this->responseException($e);
+        }
     }
 
     public function show()
