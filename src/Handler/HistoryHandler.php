@@ -30,4 +30,9 @@ class HistoryHandler implements Handler
 		}
 		return $histories;
 	}
+
+	public function getById($id)
+	{
+		return $this->repo->find($id);
+	}
 }

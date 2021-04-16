@@ -36,7 +36,7 @@ class HistoryListCommand extends Command
 		$repo = $this->driver->make($opt['driver']);
 		$handler = new HistoryHandler($repo);
 		if (isset($args['id']) && (int)$args['id'] > 0) {
-			$item = $repo->find($args['id']);
+			$item = $handler->getById($args['id']);
 			$rows = $this->createRow($item);
 			$this->createTable($rows);
 			return;
