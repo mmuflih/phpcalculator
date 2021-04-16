@@ -11,7 +11,7 @@ namespace Jakmall\Recruitment\Calculator\Handler;
 
 use Jakmall\Recruitment\Calculator\Models\CalculatorData;
 
-class MultiplyHandler
+class MultiplyHandler implements Handler
 {
 	private $numbers;
 	private $driver;

@@ -11,7 +11,7 @@ namespace Jakmall\Recruitment\Calculator\Handler;
 
 use Jakmall\Recruitment\Calculator\Models\CalculatorData;
 
-class PowHandler
+class PowHandler implements Handler
 {
 	private $base;
 	private $exp;
@@ -33,5 +33,15 @@ class PowHandler
 		$data = CalculatorData::createNew("power", $operation, $results);
 		$this->driver->make(null)->log($data->toCsv());
 		return $data;
+	}
+
+	public static function fromInputs($inputs, $driver)
+	{
+		if (count($inputs) < 2) {
+			throw new \Exception("bla bla bla");
+		}
+		$base = $inputs[0];
+		$exp = $inputs[1];
+		return new static($base, $exp, $driver);
 	}
 }
