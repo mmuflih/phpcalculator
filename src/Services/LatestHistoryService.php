@@ -18,7 +18,7 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 
 	public function findAll(): array
 	{
-		$items = file("storage/$this->filename");
+		$items = file(__DIR__ . "/../../storage/$this->filename");
 		if (!$items) {
 			return [];
 		}
@@ -41,7 +41,7 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 	{
 		try {
 			$this->checkMaxItems(10);
-			$file = fopen("storage/$this->filename", 'a+');
+			$file = fopen(__DIR__ . "/../../storage/$this->filename", 'a+');
 			fwrite($file, $command . PHP_EOL);
 			return fclose($file);
 		} catch (\Exception $e) {
@@ -60,7 +60,7 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 					continue;
 				}
 			}
-			$file = fopen("storage/$this->filename", 'w');
+			$file = fopen(__DIR__ . "/../../storage/$this->filename", 'w');
 			fwrite($file, implode("", $items));
 			return fclose($file);
 		} catch (\Exception $e) {
@@ -71,7 +71,7 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 	public function clearAll(): bool
 	{
 		try {
-			$file = fopen("storage/$this->filename", 'w');
+			$file = fopen(__DIR__ . "/../../storage/$this->filename", 'w');
 			fwrite($file, "");
 			return fclose($file);
 		} catch (\Exception $e) {
@@ -84,7 +84,7 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 		$items = $this->findAll();
 		if (count($items) > $size - 1) {
 			unset($items[0]);
-			$file = fopen("storage/$this->filename", 'w');
+			$file = fopen(__DIR__ . "/../../storage/$this->filename", 'w');
 			fwrite($file, implode("", $items));
 			fclose($file);
 		}

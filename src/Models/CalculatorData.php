@@ -37,7 +37,7 @@ class CalculatorData
 	private function generateNewId()
 	{
 		try {
-			$file = file("storage/mesinhitung.log");
+			$file = file(__DIR__ . "/../../storage/mesinhitung.log");
 			if (!$file || count($file) == 0) {
 				return 1;
 			}

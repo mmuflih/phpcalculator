@@ -18,7 +18,7 @@ class FileHistoryService implements CommandHistoryManagerInterface
 
 	public function findAll(): array
 	{
-		return file("storage/$this->filename");
+		return file(__DIR__ . "/../../storage/$this->filename");
 	}
 
 	public function find($id)
@@ -36,7 +36,7 @@ class FileHistoryService implements CommandHistoryManagerInterface
 	public function log($command): bool
 	{
 		try {
-			$file = fopen("storage/$this->filename", 'a+');
+			$file = fopen(__DIR__ . "/../../storage/$this->filename", 'a+');
 			fwrite($file, $command . PHP_EOL);
 			return fclose($file);
 		} catch (\Exception $e) {
@@ -55,7 +55,7 @@ class FileHistoryService implements CommandHistoryManagerInterface
 					continue;
 				}
 			}
-			$file = fopen("storage/$this->filename", 'w');
+			$file = fopen(__DIR__ . "/../../storage/$this->filename", 'w');
 			fwrite($file, implode("", $items));
 			return fclose($file);
 		} catch (\Exception $e) {
@@ -66,7 +66,7 @@ class FileHistoryService implements CommandHistoryManagerInterface
 	public function clearAll(): bool
 	{
 		try {
-			$file = fopen("storage/$this->filename", 'w');
+			$file = fopen(__DIR__ . "/../../storage/$this->filename", 'w');
 			fwrite($file, "");
 			return fclose($file);
 		} catch (\Exception $e) {
