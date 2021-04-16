@@ -99,11 +99,16 @@ class CalculatorData
 				$data->id = 1;
 				return $data;
 			}
+			$input = [];
+			if (isset($cols[4])) {
+				$csv = str_replace(PHP_EOL, "", self::getValue($cols[4]));
+				$input = json_decode($csv, true);
+			}
 			$data = new static(
 				self::getValue($cols[1]),
 				self::getValue($cols[2]),
 				str_replace(PHP_EOL, "", self::getValue($cols[3])),
-				(isset($cols[4]) ? str_replace(PHP_EOL, "", self::getValue($cols[4])) : ""),
+				$input,
 			);
 			$data->id = self::getValue($cols[0]);
 			return $data;
