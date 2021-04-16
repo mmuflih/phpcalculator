@@ -11,7 +11,7 @@ namespace Jakmall\Recruitment\Calculator\Commands;
 
 use Illuminate\Console\Command;
 use Jakmall\Recruitment\Calculator\Drivers\HistoryDriverInterface;
-use Jakmall\Recruitment\Calculator\Models\CalculatorData;
+use Jakmall\Recruitment\Calculator\Handler\PowHandler;
 
 class PowCommand extends Command
 {
@@ -31,11 +31,9 @@ class PowCommand extends Command
 	{
 		$base = $this->argument('base');
 		$exp = $this->argument('exp');
-		$results = $base ** $exp;
 
-		$operation = "$base ^ $exp";
-		$data = CalculatorData::createNew("power", $operation, $results);
+		$handler = new PowHandler($base, $exp, $this->driver);
+		$data = $handler->handle();
 		$data->print();
-		$this->driver->make(null)->log($data->toCsv());
 	}
 }
