@@ -57,11 +57,11 @@ class HistoryListCommand extends Command
 
 	private function createTable($rows)
 	{
-		echo "+----+-----------+-----------------------+--------+" . PHP_EOL;
-		echo "| ID |  Command  |       Operation       | Result |" . PHP_EOL;
-		echo "+----+-----------+-----------------------+--------+" . PHP_EOL;
+		echo "+----+-----------+-----------------------+--------+-----------------+" . PHP_EOL;
+		echo "| ID |  Command  |       Operation       | Result |      Input      |"   . PHP_EOL;
+		echo "+----+-----------+-----------------------+--------+-----------------+" . PHP_EOL;
 		echo $rows;
-		echo "+----+-----------+-----------------------+--------+" . PHP_EOL;
+		echo "+----+-----------+-----------------------+--------+-----------------+" . PHP_EOL;
 	}
 
 	private function createRow($data)
@@ -74,6 +74,7 @@ class HistoryListCommand extends Command
 			. "|" . $this->addSpace(11, $data->command)
 			. "|" . $this->addSpace(23, $data->operation)
 			. "|" . $this->addSpace(8, $data->result)
+			. "|" . $this->addSpace(17, $data->input)
 			. "|" . PHP_EOL;
 	}
 

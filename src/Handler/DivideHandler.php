@@ -34,7 +34,7 @@ class DivideHandler implements Handler
 			$results /= (int)$arg;
 		}
 		$operation = implode(" / ", $this->numbers);
-		$data = CalculatorData::createNew("divide", $operation, $results);
+		$data = CalculatorData::createNew("divide", $operation, $results, $this->numbers);
 		$this->driver->make(null)->log($data->toCsv());
 		return $data;
 	}
