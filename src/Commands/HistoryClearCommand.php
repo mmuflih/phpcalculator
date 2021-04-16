@@ -11,6 +11,7 @@ namespace Jakmall\Recruitment\Calculator\Commands;
 
 use Illuminate\Console\Command;
 use Jakmall\Recruitment\Calculator\Drivers\HistoryDriverInterface;
+use Jakmall\Recruitment\Calculator\Handler\RemoveHistoryHandler;
 
 class HistoryClearCommand extends Command
 {
@@ -33,16 +34,17 @@ class HistoryClearCommand extends Command
 			$opt = $this->options();
 
 			$repo = $this->driver->make($opt['driver']);
+			$handler = new RemoveHistoryHandler($repo);
 			if (isset($args['id']) && (int)$args['id'] > 0) {
 				$id = $args['id'];
-				$item = $repo->clear($id);
+				$item = $handler->removeById($id);
 				if ($item) {
 					echo "Data with ID $id is removed" . PHP_EOL;
 				}
 				return;
 			}
 
-			$success = $repo->clearAll();
+			$success = $handler->handle();
 			if ($success) {
 				echo "All history is cleared" . PHP_EOL;
 			}

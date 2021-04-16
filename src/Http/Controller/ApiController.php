@@ -37,9 +37,9 @@ class ApiController
 	 * @param mixed $data 
 	 * @return Response 
 	 */
-	public function responseData($data)
+	public function responseData($data, $code = 200)
 	{
-		$response = new Response(json_encode($data));
+		$response = new Response(json_encode($data), $code);
 		$response->headers->set('Content-Type', 'application/json');
 		return $response;
 	}

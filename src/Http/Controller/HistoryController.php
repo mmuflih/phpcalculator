@@ -5,6 +5,7 @@ namespace Jakmall\Recruitment\Calculator\Http\Controller;
 use Illuminate\Http\Request;
 use Jakmall\Recruitment\Calculator\Drivers\HistoryDriverInterface;
 use Jakmall\Recruitment\Calculator\Handler\HistoryHandler;
+use Jakmall\Recruitment\Calculator\Handler\RemoveHistoryHandler;
 
 class HistoryController extends ApiController
 {
@@ -42,9 +43,18 @@ class HistoryController extends ApiController
         }
     }
 
-    public function remove()
+    public function remove($id, Request $request)
     {
-        // todo: modify codes to remove history
-        dd('create remove history logic here');
+        try {
+            $repo = $this->driver->make($request->get('driver'));
+            $handler = new RemoveHistoryHandler($repo);
+            $data = $handler->removeById($id);
+            if (is_null($data)) {
+                throw new \Exception("Data with ID $id not found", 422);
+            }
+            return $this->responseData(null, 204);
+        } catch (\Exception $e) {
+            return $this->responseException($e);
+        }
     }
 }
