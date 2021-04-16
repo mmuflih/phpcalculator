@@ -27,9 +27,19 @@ class HistoryController extends ApiController
         }
     }
 
-    public function show()
+    public function show($id, Request $request)
     {
-        dd('create show history by id here');
+        try {
+            $repo = $this->driver->make($request->get('driver'));
+            $handler = new HistoryHandler($repo);
+            $data = $handler->getById($id);
+            if (is_null($data)) {
+                throw new \Exception("Data with ID $id not found", 422);
+            }
+            return $this->responseData($data);
+        } catch (\Exception $e) {
+            return $this->responseException($e);
+        }
     }
 
     public function remove()
