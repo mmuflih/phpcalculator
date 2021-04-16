@@ -15,25 +15,37 @@ use stdClass;
 class CalculatorData
 {
 	public $id;
+	public $input;
 	public $command;
 	public $operation;
 	public $result;
 
-	public function __construct($command, $operation, $result)
+	/**
+	 * @param mixed $command 
+	 * @param mixed $operation 
+	 * @param mixed $result 
+	 * @param array $input 
+	 * @return void 
+	 */
+	public function __construct($command, $operation, $result, $input)
 	{
+		$this->input = json_encode($input);
 		$this->command = $command;
 		$this->operation = $operation;
 		$this->result = $result;
 	}
 
+	/** @return string  */
 	public function toCsv()
 	{
-		return "id:$this->id,"
-			. "command:$this->command,"
-			. "operation:$this->operation,"
-			. "result:$this->result";
+		return "id:$this->id;"
+			. "command:$this->command;"
+			. "operation:$this->operation;"
+			. "result:$this->result;"
+			. "input:$this->input";
 	}
 
+	/** @return int  */
 	private function generateNewId()
 	{
 		try {
@@ -49,22 +61,39 @@ class CalculatorData
 		}
 	}
 
+	/** @return void  */
 	public function print()
 	{
 		echo $this->operation . " = " . $this->result . PHP_EOL;
 	}
 
-	public static function createNew($command, $operation, $result)
+	/**
+	 * @param mixed $command 
+	 * @param mixed $operation 
+	 * @param mixed $result 
+	 * @param array $input 
+	 * @return CalculatorData 
+	 */
+	public static function createNew($command, $operation, $result, $input)
 	{
-		$data = new static($command, $operation, $result);
+		$data = new static($command, $operation, $result, $input);
 		$data->id = $data->generateNewId();
 		return $data;
 	}
 
+	/**
+	 * @param mixed $str 
+	 * @return stdClass|static|null 
+	 */
 	public static function fromCsv($str)
 	{
 		try {
-			$cols = explode(",", $str);
+			/** handling old data */
+			if (strpos($str, ';')) {
+				$cols = explode(";", $str);
+			} else {
+				$cols = explode(",", $str);
+			}
 			if (is_null($str)) {
 				$data = new stdClass;
 				$data->id = 1;
@@ -73,7 +102,8 @@ class CalculatorData
 			$data = new static(
 				self::getValue($cols[1]),
 				self::getValue($cols[2]),
-				str_replace(PHP_EOL, "", self::getValue($cols[3]))
+				str_replace(PHP_EOL, "", self::getValue($cols[3])),
+				(isset($cols[4]) ? str_replace(PHP_EOL, "", self::getValue($cols[4])) : ""),
 			);
 			$data->id = self::getValue($cols[0]);
 			return $data;
@@ -82,6 +112,10 @@ class CalculatorData
 		}
 	}
 
+	/**
+	 * @param mixed $str 
+	 * @return string 
+	 */
 	private static function getValue($str)
 	{
 		$data = explode(":", $str);

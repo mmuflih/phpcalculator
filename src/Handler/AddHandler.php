@@ -31,7 +31,7 @@ class AddHandler implements Handler
 		}
 
 		$operation = implode(" + ", $this->numbers);
-		$data = CalculatorData::createNew("add", $operation, $results);
+		$data = CalculatorData::createNew("add", $operation, $results, $this->numbers);
 		$this->driver->make(null)->log($data->toCsv());
 		return $data;
 	}

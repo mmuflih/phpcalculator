@@ -30,7 +30,7 @@ class PowHandler implements Handler
 		$results = $this->base ** $this->exp;
 
 		$operation = "$this->base ^ $this->exp";
-		$data = CalculatorData::createNew("power", $operation, $results);
+		$data = CalculatorData::createNew("power", $operation, $results, [$this->base, $this->exp]);
 		$this->driver->make(null)->log($data->toCsv());
 		return $data;
 	}

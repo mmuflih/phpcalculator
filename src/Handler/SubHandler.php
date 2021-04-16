@@ -34,7 +34,7 @@ class SubHandler implements Handler
 			$results -= (int)$arg;
 		}
 		$operation = implode(" - ", $this->numbers);
-		$data = CalculatorData::createNew("subtract", $operation, $results);
+		$data = CalculatorData::createNew("subtract", $operation, $results, $this->numbers);
 		$this->driver->make(null)->log($data->toCsv());
 		return $data;
 	}
