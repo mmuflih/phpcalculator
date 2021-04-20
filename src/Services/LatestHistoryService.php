@@ -27,10 +27,13 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 
 	public function find($id)
 	{
-		$data = $this->findAll();
-		foreach ($data as $item) {
+		$items = $this->findAll();
+		foreach ($items as $key => $item) {
 			$data = CalculatorData::fromCsv($item);
 			if ($data->id == $id) {
+				unset($items[$key]);
+				$items[] = $item;
+				$this->updateData($items);
 				return $data;
 			}
 		}
@@ -88,5 +91,11 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 			fwrite($file, implode("", $items));
 			fclose($file);
 		}
+	}
+
+	private function updateData($items)
+	{
+		$file = fopen(__DIR__ . "/../../storage/$this->filename", 'w');
+		fwrite($file, implode("", $items));
 	}
 }
