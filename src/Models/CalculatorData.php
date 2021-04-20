@@ -19,6 +19,7 @@ class CalculatorData
 	public $command;
 	public $operation;
 	public $result;
+	public $prevId;
 
 	/**
 	 * @param mixed $command 
@@ -27,12 +28,18 @@ class CalculatorData
 	 * @param array $input 
 	 * @return void 
 	 */
-	public function __construct($command, $operation, $result, $input)
-	{
+	public function __construct(
+		$command,
+		$operation,
+		$result,
+		$input,
+		$prevId = 0
+	) {
 		$this->input = json_encode($input);
 		$this->command = $command;
 		$this->operation = $operation;
 		$this->result = $result;
+		$this->prevId = $prevId;
 	}
 
 	/** @return string  */
@@ -42,7 +49,8 @@ class CalculatorData
 			. "command:$this->command;"
 			. "operation:$this->operation;"
 			. "result:$this->result;"
-			. "input:$this->input";
+			. "input:$this->input;"
+			. "prevId:$this->prevId";
 	}
 
 	/** @return int  */
@@ -100,21 +108,43 @@ class CalculatorData
 				return $data;
 			}
 			$input = [];
+			$prevId = "";
 			if (isset($cols[4])) {
 				$csv = str_replace(PHP_EOL, "", self::getValue($cols[4]));
 				$input = json_decode($csv, true);
+			}
+			if (isset($cols[5])) {
+				$prevId = str_replace(PHP_EOL, "", self::getValue($cols[5]));
 			}
 			$data = new static(
 				self::getValue($cols[1]),
 				self::getValue($cols[2]),
 				str_replace(PHP_EOL, "", self::getValue($cols[3])),
 				$input,
+				$prevId,
 			);
 			$data->id = self::getValue($cols[0]);
 			return $data;
 		} catch (\Exception $e) {
 			return null;
 		}
+	}
+
+	/**
+	 * @param mixed $items 
+	 * @return mixed 
+	 */
+	public static function getLastInsertedItem($items)
+	{
+		if (count($items) < 1) {
+			return 0;
+		}
+
+		if (count($items) < 2) {
+			return 1;
+		}
+		$lastItem = CalculatorData::fromCsv($items[count($items) - 1]);
+		return $lastItem->id;
 	}
 
 	/**
