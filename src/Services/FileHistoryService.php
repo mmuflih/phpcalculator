@@ -36,6 +36,11 @@ class FileHistoryService implements CommandHistoryManagerInterface
 	public function log($command): bool
 	{
 		try {
+			/** set provious id */
+			$data = CalculatorData::fromCsv($command);
+			$data->prevId = CalculatorData::getLastInsertedItem($this->findAll());
+			$command = $data->toCsv();
+
 			$file = fopen(__DIR__ . "/../../storage/$this->filename", 'a+');
 			fwrite($file, $command . PHP_EOL);
 			return fclose($file);

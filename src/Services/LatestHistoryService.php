@@ -33,6 +33,7 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 			if ($data->id == $id) {
 				unset($items[$key]);
 				$items[] = $item;
+				$items = $this->updateLinkedData($items, $key, $data);
 				$this->updateData($items);
 				return $data;
 			}
@@ -43,6 +44,11 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 	public function log($command): bool
 	{
 		try {
+			/** set provious id */
+			$data = CalculatorData::fromCsv($command);
+			$data->prevId = CalculatorData::getLastInsertedItem($this->findAll());
+			$command = $data->toCsv();
+
 			$this->checkMaxItems(10);
 			$file = fopen(__DIR__ . "/../../storage/$this->filename", 'a+');
 			fwrite($file, $command . PHP_EOL);
@@ -56,13 +62,20 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 	{
 		try {
 			$items = $this->findAll();
+			$k = 0;
+			$dataClear = null;
 			foreach ($items as $key => $item) {
 				$data = CalculatorData::fromCsv($item);
 				if ($data->id == $id) {
+					$k = $key;
+					$dataClear = $data;
 					unset($items[$key]);
 					continue;
 				}
 			}
+
+			$items = $this->checkAndSetFirstData($items, $k, $dataClear);
+
 			$file = fopen(__DIR__ . "/../../storage/$this->filename", 'w');
 			fwrite($file, implode("", $items));
 			return fclose($file);
@@ -97,5 +110,59 @@ class LatestHistoryService implements CommandHistoryManagerInterface
 	{
 		$file = fopen(__DIR__ . "/../../storage/$this->filename", 'w');
 		fwrite($file, implode("", $items));
+	}
+
+	private function updateLinkedData(array $items, $key, $data)
+	{
+		$prev = null;
+		$prevId = null;
+		if ($key == 0) {
+			$prevId = $data->prevId;
+		}
+		foreach ($items as $k => $item) {
+			if ($key != 0 && $k < $key) {
+				$prev = $item;
+				continue;
+			}
+			$currentObj = CalculatorData::fromCsv($item);
+			$prevObj = CalculatorData::fromCsv($prev);
+			$currentObj->prevId = $prevObj->id;
+			if (!is_null($prevId)) {
+				$currentObj->prevId = $prevId;
+				$prevId = null;
+			}
+			$items[$k] = $currentObj->toCsv() . PHP_EOL;
+
+			/** update prev */
+			$prev = $item;
+		}
+		return $items;
+	}
+
+	private function checkAndSetFirstData($items, $key, $data)
+	{
+		$fileSvc = new FileHistoryService();
+		$fileHistoryCount = count($fileSvc->findAll());
+		if ($key == 0 && $fileHistoryCount <= 10) {
+			return $items;
+		}
+		$newItems = [];
+		if ($key == 0 && count($items) < 10 && !is_null($data)) {
+			if ($data->prevId == 0) {
+				return $items;
+			}
+			$oldObject = $fileSvc->find($data->prevId);
+			$newItems[] = $oldObject->toCsv() . PHP_EOL;
+		} else if (count($items) < 10) {
+			foreach ($items as $item) {
+				$first = CalculatorData::fromCsv($item);
+				$oldObject = $fileSvc->find($first->prevId);
+				$newItems[] = $oldObject->toCsv() . PHP_EOL;
+				break;
+			}
+		} else {
+			return $items;
+		}
+		return array_merge($newItems, $items);
 	}
 }
